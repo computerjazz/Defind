@@ -5,6 +5,8 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.danielmerrill.ocrlive.AsyncResponse;
+import com.danielmerrill.ocrlive.Core.CameraEngine;
 import com.danielmerrill.ocrlive.Core.Dialogs.ImageDialog;
 import com.danielmerrill.ocrlive.Core.Imaging.Tools;
 
@@ -19,10 +21,11 @@ public class TessAsyncEngine extends AsyncTask<Object, Void, String> {
 
     private Activity context;
 
+    public AsyncResponse delegate = null;
+
 
     @Override
     protected String doInBackground(Object... params) {
-
         try {
 
             if(params.length < 2) {
@@ -79,11 +82,7 @@ public class TessAsyncEngine extends AsyncTask<Object, Void, String> {
         if(s == null || bmp == null || context == null)
             return;
 
-        ImageDialog.New()
-                .addBitmap(bmp)
-                .addTitle(s)
-                .show(context.getFragmentManager(), TAG);
-
+        delegate.processFinish(s);
         super.onPostExecute(s);
     }
 }

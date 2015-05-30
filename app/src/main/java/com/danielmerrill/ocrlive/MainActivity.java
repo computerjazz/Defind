@@ -2,6 +2,7 @@ package com.danielmerrill.ocrlive;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.hardware.Camera;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -9,29 +10,39 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.danielmerrill.ocrlive.Core.CameraEngine;
 import com.danielmerrill.ocrlive.Core.ExtraViews.FocusBoxView;
 import com.danielmerrill.ocrlive.Core.Imaging.Tools;
 import com.danielmerrill.ocrlive.Core.TessTool.TessAsyncEngine;
+import com.danielmerrill.ocrlive.Core.Imaging.Utils;
 
 
 public class MainActivity extends Activity implements SurfaceHolder.Callback, View.OnClickListener,
-        Camera.PictureCallback, Camera.ShutterCallback {
+        Camera.PictureCallback, Camera.ShutterCallback, AsyncResponse {
 
     static final String TAG = "DBG_" + MainActivity.class.getName();
 
     Button shutterButton;
-    Button focusButton;
     FocusBoxView focusBox;
     SurfaceView cameraFrame;
     CameraEngine cameraEngine;
+    TextView testText;
+    ImageView previewImage;
+    Rect previewBox;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        testText = (TextView)findViewById(R.id.text_preview);
+
+        previewImage = (ImageView) findViewById(R.id.image_preview);
     }
 
     @Override
@@ -48,7 +59,12 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
             return;
         }
 
-        cameraEngine = CameraEngine.New(holder);
+        cameraEngine = CameraEngine.New(holder, this);
+        cameraEngine.setHeight(holder.getSurfaceFrame().height());
+        cameraEngine.setWidth(holder.getSurfaceFrame().width());
+        cameraEngine.setImagePreview(previewImage);
+        cameraEngine.setBox(focusBox.getBox());
+
         cameraEngine.start();
 
         Log.d(TAG, "Camera engine started");
@@ -56,6 +72,11 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+        cameraEngine.setHeight(height);
+        cameraEngine.setWidth(width);
+        cameraEngine.setBox(focusBox.getBox());
+
+
 
     }
 
@@ -69,12 +90,10 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
         super.onResume();
 
         cameraFrame = (SurfaceView) findViewById(R.id.camera_frame);
-        shutterButton = (Button) findViewById(R.id.shutter_button);
         focusBox = (FocusBoxView) findViewById(R.id.focus_box);
-        focusButton = (Button) findViewById(R.id.focus_button);
+        previewBox = focusBox.getBox();
+        Log.i(TAG, previewBox.left + " " + previewBox.top + " " + previewBox.width() + " " + previewBox.height());
 
-        shutterButton.setOnClickListener(this);
-        focusButton.setOnClickListener(this);
 
         SurfaceHolder surfaceHolder = cameraFrame.getHolder();
         surfaceHolder.addCallback(this);
@@ -97,17 +116,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
 
     @Override
     public void onClick(View v) {
-        if(v == shutterButton){
-            if(cameraEngine != null && cameraEngine.isOn()){
-                cameraEngine.takeShot(this, this, this);
-            }
-        }
 
-        if(v == focusButton){
-            if(cameraEngine!=null && cameraEngine.isOn()){
-                cameraEngine.requestFocus();
-            }
-        }
     }
 
     @Override
@@ -119,6 +128,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
             Log.d(TAG, "Got null data");
             return;
         }
+
 
         Bitmap bmp = Tools.getFocusedBitmap(this, camera, data, focusBox.getBox());
 
@@ -133,6 +143,16 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
     @Override
     public void onShutter() {
 
+    }
+
+    public void setPreviewImage(Bitmap bmp) {
+        if (bmp != null) {
+            previewImage.setImageBitmap(bmp);
+        }
+    }
+
+    public void processFinish(String s) {
+        testText.setText(s);
     }
 
 }

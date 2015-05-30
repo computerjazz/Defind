@@ -35,7 +35,8 @@ public class FocusBoxView extends View {
         frameColor = resources.getColor(R.color.focus_box_frame);
         cornerColor = resources.getColor(R.color.focus_box_corner);
 
-        this.setOnTouchListener(getTouchListener());
+        // Don't allow user to resize box
+        //this.setOnTouchListener(getTouchListener());
     }
 
     private Rect box;
@@ -48,7 +49,9 @@ public class FocusBoxView extends View {
 
             ScrRes = FocusBoxUtils.getScreenResolution(getContext());
 
+            // Box takes up 6/7 of screen width
             int width = ScrRes.x * 6 / 7;
+            // Box takes up 1/9 of screen height
             int height = ScrRes.y / 9;
 
             width = width == 0
@@ -58,7 +61,7 @@ public class FocusBoxView extends View {
             height = height == 0
                     ? MIN_FOCUS_BOX_HEIGHT
                     : height < MIN_FOCUS_BOX_HEIGHT ? MIN_FOCUS_BOX_HEIGHT : height;
-
+            // Set box equidistant on both sides
             int left = (ScrRes.x - width) / 2;
             int top = (ScrRes.y - height) / 2;
 
@@ -69,7 +72,7 @@ public class FocusBoxView extends View {
     }
 
     public Rect getBox() {
-        return box;
+        return getBoxRect();
     }
 
     private void updateBoxRect(int dW, int dH) {
@@ -244,11 +247,12 @@ public class FocusBoxView extends View {
         canvas.drawRect(frame.right - 1, frame.top, frame.right + 1, frame.bottom - 1, paint);
         canvas.drawRect(frame.left, frame.bottom - 1, frame.right + 1, frame.bottom + 1, paint);
 
+        // We don't need the circles since we aren't resizing
         paint.setColor(cornerColor);
-        canvas.drawCircle(frame.left - 32, frame.top - 32, 32, paint);
+        /*canvas.drawCircle(frame.left - 32, frame.top - 32, 32, paint);
         canvas.drawCircle(frame.right + 32, frame.top - 32, 32, paint);
         canvas.drawCircle(frame.left - 32, frame.bottom + 32, 32, paint);
-        canvas.drawCircle(frame.right + 32, frame.bottom + 32, 32, paint);
+        canvas.drawCircle(frame.right + 32, frame.bottom + 32, 32, paint);*/
 
     }
 }

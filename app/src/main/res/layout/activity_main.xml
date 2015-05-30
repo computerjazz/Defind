@@ -14,15 +14,31 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
 
-    <Button
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:id="@+id/shutter_button"
-        android:layout_gravity="center_horizontal|bottom"
-        android:layout_marginBottom="50dp"
-        android:background="@drawable/shutter_layout" />
 
-    <Button
+    <ImageView
+        android:layout_width="400dp"
+        android:layout_gravity="center_horizontal|top"
+        android:gravity="center_horizontal"
+        android:layout_height="100dp"
+        android:layout_marginTop="25dp"
+        android:id="@+id/image_preview"
+         />
+
+    <TextView
+        android:layout_width="400dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center_horizontal|top"
+        android:gravity="center_horizontal"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="150dp"
+        android:id="@+id/text_preview"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:padding="5dp"
+        android:textColor="#EEEEEE"
+        android:minWidth="100dp" />
+
+<!--    <Button
         style="?android:attr/buttonStyleSmall"
         android:layout_width="75dp"
         android:layout_height="75dp"
@@ -31,7 +47,7 @@
         android:layout_marginRight="50dp"
         android:layout_marginEnd="50dp"
         android:layout_marginBottom="62dp"
-        android:background="@drawable/focus_layout" />
+        android:background="@drawable/focus_layout" />-->
 
 
 </FrameLayout>

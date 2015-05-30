@@ -9,6 +9,7 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.hardware.Camera;
+import android.util.Log;
 
 import com.danielmerrill.ocrlive.Core.ExtraViews.FocusBoxUtils;
 
@@ -16,6 +17,8 @@ import com.danielmerrill.ocrlive.Core.ExtraViews.FocusBoxUtils;
  * Created by Fadi on 5/11/2014.
  */
 public class Tools {
+
+    private static String TAG = "LiveDict_tools";
 
     public static Bitmap rotateBitmap(Bitmap source, float angle) {
         Matrix matrix = new Matrix();
@@ -130,6 +133,7 @@ public class Tools {
         int RH = box.height();
         int RL = box.left;
         int RT = box.top;
+        Log.i(TAG, "BOX Left= " + box.left + ", Top= " + box.top +", Width=" + box.width() + ", Height= " + box.height());
 
         float RSW = (float) (RW * Math.pow(SW, -1));
         float RSH = (float) (RH * Math.pow(SH, -1));

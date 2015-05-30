@@ -18,7 +18,7 @@ public class FocusBoxUtils {
 
 
     private static int MIN_PREVIEW_PIXELS = 470 * 320;
-    private static int MAX_PREVIEW_PIXELS = 800 * 600;
+    private static int MAX_PREVIEW_PIXELS = 1280 * 720;
 
     public static Point getScreenResolution(Context context) {
 
