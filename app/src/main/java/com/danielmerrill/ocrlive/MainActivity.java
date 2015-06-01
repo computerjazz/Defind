@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.danielmerrill.ocrlive.Core.CameraEngine;
@@ -31,18 +32,24 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
     FocusBoxView focusBox;
     SurfaceView cameraFrame;
     CameraEngine cameraEngine;
-    TextView testText;
+
+    TextView wordText;
+    TextView definitionText;
+    TextView statusText;
+
     ImageView previewImage;
     Rect previewBox;
+    String tempWord;
+    String foundWord;
+    WordUtils wordUtils;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        testText = (TextView)findViewById(R.id.text_preview);
+        wordUtils = new WordUtils(this);
 
-        previewImage = (ImageView) findViewById(R.id.image_preview);
     }
 
     @Override
@@ -75,9 +82,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
         cameraEngine.setHeight(height);
         cameraEngine.setWidth(width);
         cameraEngine.setBox(focusBox.getBox());
-
-
-
     }
 
     @Override
@@ -87,12 +91,16 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
 
     @Override
     protected void onResume() {
+        Log.i(TAG, "onResume()");
         super.onResume();
 
         cameraFrame = (SurfaceView) findViewById(R.id.camera_frame);
         focusBox = (FocusBoxView) findViewById(R.id.focus_box);
         previewBox = focusBox.getBox();
-        Log.i(TAG, previewBox.left + " " + previewBox.top + " " + previewBox.width() + " " + previewBox.height());
+        wordText = (TextView)findViewById(R.id.word_text);
+        definitionText = (TextView)findViewById(R.id.definition_text);
+        statusText = (TextView)findViewById(R.id.status_text);
+        previewImage = (ImageView) findViewById(R.id.image_preview);
 
 
         SurfaceHolder surfaceHolder = cameraFrame.getHolder();
@@ -104,9 +112,11 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
 
     @Override
     protected void onPause() {
+        Log.i(TAG, "onPause()");
         super.onPause();
 
         if (cameraEngine != null && cameraEngine.isOn()) {
+            Log.i(TAG, "stopping camera");
             cameraEngine.stop();
         }
 
@@ -124,19 +134,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
 
         Log.d(TAG, "Picture taken");
 
-        if (data == null) {
-            Log.d(TAG, "Got null data");
-            return;
-        }
-
-
-        Bitmap bmp = Tools.getFocusedBitmap(this, camera, data, focusBox.getBox());
-
-        Log.d(TAG, "Got bitmap");
-
-        Log.d(TAG, "Initialization of TessBaseApi");
-
-        new TessAsyncEngine().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, this, bmp);
 
     }
 
@@ -151,8 +148,30 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
         }
     }
 
-    public void processFinish(String s) {
-        testText.setText(s);
+    public void processFinish(String s, AsyncTypes.Type type) {
+        Log.i(TAG, "onProcessFinish() - " + s);
+        if (s.length() > 0) {
+            switch (type) {
+                case WORD:
+                    foundWord = StringUtils.parseLines(s);
+                    if (foundWord.length() > 1) {
+                        wordUtils.setWord(foundWord);
+                    }
+                    break;
+
+                case DEFINITION:
+                    if (s.length() > 0) {
+                        wordText.setText(foundWord);
+                        definitionText.setText(s);
+                    }
+                    break;
+
+
+            }
+        }
+
+
+
     }
 
 }

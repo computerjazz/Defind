@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.danielmerrill.ocrlive.AsyncResponse;
+import com.danielmerrill.ocrlive.AsyncTypes;
 import com.danielmerrill.ocrlive.Core.CameraEngine;
 import com.danielmerrill.ocrlive.Core.Dialogs.ImageDialog;
 import com.danielmerrill.ocrlive.Core.Imaging.Tools;
@@ -82,7 +83,7 @@ public class TessAsyncEngine extends AsyncTask<Object, Void, String> {
         if(s == null || bmp == null || context == null)
             return;
 
-        delegate.processFinish(s);
+        delegate.processFinish(s, AsyncTypes.Type.WORD);
         super.onPostExecute(s);
     }
 }

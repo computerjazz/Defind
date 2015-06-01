@@ -27,7 +27,7 @@ import java.io.IOException;
  */
 public class CameraEngine {
 
-    static final String TAG = "DBG_" + CameraUtils.class.getName();
+    static final String TAG = CameraEngine.class.getName();
     Camera.Parameters params;
     Activity mActivity;
     boolean on;
@@ -38,12 +38,17 @@ public class CameraEngine {
     private int width;
     private int height;
     private boolean cameraConfigured = false;
-    private Rect previewBox;
     private AsyncResponse mDelegate;
     private TessAsyncEngine testEngine;
 
     private ImageView imagePreview;
     private Bitmap previewBmp;
+
+    Rect captureRect;
+
+    // Set up some TessAsyncEngines
+    private int numEngines = 1;
+    private TessAsyncEngine[] engineArray = new TessAsyncEngine[numEngines];
 
     Camera.AutoFocusCallback autoFocusCallback = new Camera.AutoFocusCallback() {
         @Override
@@ -59,23 +64,30 @@ public class CameraEngine {
     public void setBox(Rect box) {
         Log.i(TAG, "setBox()");
         if (box != null) {
-            previewBox = box;
             // Log.i(TAG, "setting previewBox: width = " + previewBox.width() + ", height = " + previewBox.height() + ", left = " + previewBox.left + ", top = " + previewBox.top + ", right = " + previewBox.right + ", bottom = " + previewBox.bottom);
         }
     }
 
     public Rect calcBox() {
         // Previewsize assumes landscape, so the math gets a little wonky
-        int width = previewSize.height * 6 / 7;
-        int height = previewSize.width / 9;
-        int wGap = (previewSize.height - width) / 2;
-        int top = (previewSize.height - width) / 2;
-        int left = previewSize.width / 2;
+        // rect takes                 (left, top, right, bottom)
+        // but that translates to our (top, right, bottom, left)
+        int screenWidth = previewSize.height;
+        int screenHeight = previewSize.width;
+
+        int width = screenWidth * 6 / 7;
+        int height = screenHeight / 9;
+
+        int top = (screenWidth - width) / 2;
+        int left = (screenWidth - width) / 2;;
+        int right = left + width;
         // Give a little more room at the bottom
-        int right = left + height + (height/4);
-        int bottom = top + width;
+        int bottom = top + height + (height/4);
+
         Log.i(TAG, "calcBox(): left=" + left + ", top=" + top + ", right=" + right + ", bottom=" + bottom);
-        return new Rect(left, top, right, bottom);
+
+
+        return new Rect(top, left, bottom, right);
     }
 
     // Scale preview box from its location on the raw image size to its location on our "best" preview size
@@ -150,8 +162,6 @@ public class CameraEngine {
         if (this.camera == null)
             return;
 
-        // Now that we have our preview size, scale box to fit
-        previewBox = calcBox();
 
 
         Log.d(TAG, "Got camera hardware");
@@ -166,13 +176,13 @@ public class CameraEngine {
             // Testing new code here
             // Update data each time we get a preview frame
             yuv = new byte[getBufferSize()];
+
             // Initialize a box to use for capture
-            final Rect captureRect = calcBox();
-            // set a time delay
+            captureRect = calcBox();
+            Log.i(TAG, "captureRect: " + captureRect.width() + " " + captureRect.height());
 
             camera.addCallbackBuffer(yuv);
             camera.setPreviewCallbackWithBuffer(new Camera.PreviewCallback() {
-
 
                 @Override
                 public void onPreviewFrame(byte[] data, Camera camera) {
@@ -180,26 +190,38 @@ public class CameraEngine {
                         try {
                             //Log.i(TAG, "inside onPreviewFrame()");
                             //Log.i(TAG, captureRect.width() + ", " + captureRect.height());
-                            previewBmp = null;
-                            previewBmp = getBitmapImageFromYUV(data, captureRect, previewSize.width, previewSize.height);
-                            if (previewBmp == null) {
-                                Log.i(TAG, "BITMAP NULL!");
-                            }
-                            //Log.i(TAG, "previewBmp size: " + previewBmp.getWidth() + " x " + previewBmp.getHeight());
-                            previewBmp = rotateBitmap(previewBmp, 90);
-                            mActivity.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    imagePreview.setImageBitmap(previewBmp);
-                                }
-                            });
+                            boolean engineFree = false;
+                            int engineIndex = 0;
 
-                            if ((testEngine == null) || (testEngine.getStatus() != AsyncTask.Status.RUNNING)) {
+                            for (int i = 0; i < numEngines; i++) {
+                                if ((engineArray[i] == null) || (engineArray[i].getStatus() != AsyncTask.Status.RUNNING)) {
+                                    engineFree = true;
+                                    engineIndex = i;
+                                    break;
+                                }
+                            }
+
+                            if (engineFree) {
+                                previewBmp = null;
+                                previewBmp = getBitmapImageFromYUV(data, captureRect, previewSize.width, previewSize.height);
+                                if (previewBmp == null) {
+                                    Log.i(TAG, "BITMAP NULL!");
+                                }
+                                //Log.i(TAG, "previewBmp size: " + previewBmp.getWidth() + " x " + previewBmp.getHeight());
+                                previewBmp = rotateBitmap(previewBmp, 90);
+                                mActivity.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        imagePreview.setImageBitmap(previewBmp);
+                                    }
+                                });
+
+
                                 Log.i(TAG, "Creating new tessengine");
                                 TessAsyncEngine tessEngine = new TessAsyncEngine();
                                 tessEngine.delegate = (AsyncResponse)mActivity;
-                                tessEngine.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, mActivity, previewBmp);
-                                testEngine = tessEngine;
+                                tessEngine.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mActivity, previewBmp);
+                                engineArray[engineIndex] = tessEngine;
                             }
 
 

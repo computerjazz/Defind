@@ -61,9 +61,13 @@ public class FocusBoxView extends View {
             height = height == 0
                     ? MIN_FOCUS_BOX_HEIGHT
                     : height < MIN_FOCUS_BOX_HEIGHT ? MIN_FOCUS_BOX_HEIGHT : height;
+
             // Set box equidistant on both sides
             int left = (ScrRes.x - width) / 2;
-            int top = (ScrRes.y - height) / 2;
+            //int top = (ScrRes.y - height) / 2;
+
+            // Use the same margin as width for the top
+            int top = left;
 
             box = new Rect(left, top, left + width, top + height);
         }
@@ -242,9 +246,13 @@ public class FocusBoxView extends View {
         paint.setAlpha(0);
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(frameColor);
-        canvas.drawRect(frame.left, frame.top, frame.right + 1, frame.top + 2, paint);
-        canvas.drawRect(frame.left, frame.top + 2, frame.left + 2, frame.bottom - 1, paint);
-        canvas.drawRect(frame.right - 1, frame.top, frame.right + 1, frame.bottom - 1, paint);
+
+        int vertHeight = frame.height() * 3 / 4;
+
+        //Draw the frame
+        //canvas.drawRect(frame.left, frame.top, frame.right + 1, frame.top + 2, paint);
+        canvas.drawRect(frame.left, (frame.top + 2) + vertHeight , frame.left + 2, frame.bottom - 1, paint);
+        canvas.drawRect(frame.right - 1, (frame.top) + vertHeight  , frame.right + 1, frame.bottom - 1, paint);
         canvas.drawRect(frame.left, frame.bottom - 1, frame.right + 1, frame.bottom + 1, paint);
 
         // We don't need the circles since we aren't resizing
