@@ -2,106 +2,90 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:id="@+id/frame_layout">
+
+    <View
+        android:id="@+id/black_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black"
+        />
 
     <SurfaceView
         android:id="@+id/camera_frame"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <com.danielmerrill.ocrlive.Core.ExtraViews.FocusBoxView
         android:id="@+id/focus_box"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 
-    <TextView
-        android:id="@+id/status_text"
-        android:layout_width="400dp"
+
+    <ImageView
+        android:layout_width="200dp"
+        android:layout_gravity="center_horizontal|bottom"
+        android:gravity="center_horizontal"
         android:layout_height="50dp"
-        android:textColor="#EEEEEE" />
+        android:layout_marginTop="10dp"
+        android:id="@+id/image_preview"
+        android:contentDescription="image preview"
+        />
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="100dp">
+        android:orientation="vertical">
 
-        <ScrollView
-            android:layout_width="300dp"
-            android:layout_height="350dp"
-            android:layout_gravity="center_horizontal">
 
-            <LinearLayout
+        <Space
+            android:layout_width="1dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"/>
+
+        <TextView
+            android:id="@+id/status_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+        <RelativeLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_weight="5"
+            >
+
+            <TextView
+                android:id="@+id/word_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|top"
+                android:gravity="center_horizontal"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:padding="5dp"
+                android:textColor="#EEEEEE"
+                android:minWidth="100dp"
+                android:maxWidth="300dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:textSize="@dimen/abc_text_size_title_material"
+                android:textStyle="bold"
+                />
+
+            <ListView
+                android:id="@+id/definition_list"
                 android:layout_width="300dp"
-                android:layout_height="400dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/word_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal|top"
-                    android:gravity="center_horizontal"
-                    android:layout_centerInParent="true"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp"
-                    android:padding="5dp"
-                    android:textColor="#EEEEEE"
-                    android:minWidth="100dp"
-                    android:maxWidth="300dp"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:textSize="@dimen/abc_text_size_title_material"
-                    android:textStyle="bold"
-                    android:capitalize="words"
-                     />
-
-                <TextView
-                    android:id="@+id/definition_text"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="left|top"
-                    android:layout_weight="1"
-                    android:layout_centerInParent="true"
-                    android:padding="5dp"
-                    android:textColor="#EEEEEE"
-                    android:minWidth="100dp"
-                    android:scrollHorizontally="false"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:maxLines="100"
-                    android:singleLine="false"
-                    android:textAlignment="gravity"
-                    />
-
-            </LinearLayout>
-
-
-        </ScrollView>
-
-        <ImageView
-            android:layout_width="200dp"
-            android:layout_gravity="center_horizontal|bottom"
-            android:gravity="center_horizontal"
-            android:layout_height="50dp"
-            android:layout_marginTop="10dp"
-            android:id="@+id/image_preview"
-             />
+                android:layout_height="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:layout_below="@id/word_text"
+                android:textSize="@dimen/abc_text_size_body_1_material"
+                android:layout_centerHorizontal="true">
+            </ListView>
+        </RelativeLayout>
 
     </LinearLayout>
-
-
-    <!--    <Button
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="75dp"
-            android:layout_height="75dp"
-            android:id="@+id/focus_button"
-            android:layout_gravity="end|bottom"
-            android:layout_marginRight="50dp"
-            android:layout_marginEnd="50dp"
-            android:layout_marginBottom="62dp"
-            android:background="@drawable/focus_layout" />-->
-
-
 </FrameLayout>

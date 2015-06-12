@@ -4,9 +4,11 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -24,6 +26,10 @@ public class FocusBoxView extends View {
     private final int maskColor;
     private final int frameColor;
     private final int cornerColor;
+    private final String TAG = getClass().getSimpleName();
+    private Point triA;
+    private Point triB;
+    private Point triC;
 
     public FocusBoxView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -76,7 +82,7 @@ public class FocusBoxView extends View {
     }
 
     public Rect getBox() {
-        return getBoxRect();
+        return box;
     }
 
     private void updateBoxRect(int dW, int dH) {
@@ -236,6 +242,7 @@ public class FocusBoxView extends View {
 
         int width = canvas.getWidth();
         int height = canvas.getHeight();
+        Log.i(TAG, "Canvas width=" + width + ", height= " + height);
 
         paint.setColor(maskColor);
         canvas.drawRect(0, 0, width, frame.top, paint);
@@ -254,6 +261,30 @@ public class FocusBoxView extends View {
         canvas.drawRect(frame.left, (frame.top + 2) + vertHeight , frame.left + 2, frame.bottom - 1, paint);
         canvas.drawRect(frame.right - 1, (frame.top) + vertHeight  , frame.right + 1, frame.bottom - 1, paint);
         canvas.drawRect(frame.left, frame.bottom - 1, frame.right + 1, frame.bottom + 1, paint);
+
+        // Draw the pointer triangle
+        // First get midpoint of the screen to center it
+        int screenMid = width/2;
+        // Set the triangle's width and height
+        int triWidth = 10;
+        int triHeight = 10;
+
+        // Bottom left
+        triA = new Point(screenMid - triWidth, frame.bottom);
+        // Bottom Right
+        triB = new Point(screenMid + triWidth, frame.bottom);
+        // Top
+        triC = new Point(screenMid, frame.bottom - triHeight);
+
+        Path path = new Path();
+        path.setFillType(Path.FillType.EVEN_ODD);
+        path.moveTo(triB.x, triB.y);
+        path.lineTo(triB.x, triB.y);
+        path.lineTo(triC.x, triC.y);
+        path.lineTo(triA.x, triA.y);
+        path.close();
+
+        canvas.drawPath(path, paint);
 
         // We don't need the circles since we aren't resizing
         paint.setColor(cornerColor);

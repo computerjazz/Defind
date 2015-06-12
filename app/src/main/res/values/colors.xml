@@ -18,8 +18,9 @@
     <!-- translation text color -->
     <color name="focus_box_corner">#ffffffff</color>
     <!-- four corner elements for viewfinder -->
-    <color name="focus_box_frame">#ffffd740</color>
+    <color name="focus_box_frame">#ffffffff</color>
     <!-- viewfinder rectangle -->
     <color name="focus_box_mask">#60000000</color>
     <!-- viewfinder exterior darkened area -->
+    <color name="black">#ff000000</color>
 </resources>

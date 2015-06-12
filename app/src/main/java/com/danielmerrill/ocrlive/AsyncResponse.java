@@ -1,5 +1,7 @@
 package com.danielmerrill.ocrlive;
 
+import org.json.JSONArray;
+
 /**
  * Created by danielmerrill on 5/29/15.
  *
@@ -7,4 +9,5 @@ package com.danielmerrill.ocrlive;
  */
 public interface AsyncResponse {
     void processFinish(String output, AsyncTypes.Type type);
+    void setListAdapter(JSONArray jsonArray);
 }

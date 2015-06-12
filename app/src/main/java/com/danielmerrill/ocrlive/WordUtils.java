@@ -33,11 +33,11 @@ public class WordUtils {
     }
 
     private void makeUrl() {
-        mUrl = baseUrl + word + "/definitions?api_key=" + API_KEY;
+        mUrl = baseUrl + word + "/definitions?limit=10&includeRelated=false&useCanonical=true&includeTags=false&api_key=" + API_KEY;
         Log.i(TAG, mUrl);
     }
 
-    private class AsyncTaskParseJson extends AsyncTask<String, String, String> {
+    private class AsyncTaskParseJson extends AsyncTask<String, Void, JSONArray> {
         final String TAG = "AsyncTaskParseJson";
         public AsyncResponse delegate = null;
         String response = "";
@@ -49,7 +49,7 @@ public class WordUtils {
         protected void onPreExecute() {}
 
         @Override
-        protected String doInBackground(String... arg0) {
+        protected JSONArray doInBackground(String... arg0) {
             try {
                 // Instantiate JSON parser
                 JsonParser jParser = new JsonParser();
@@ -64,7 +64,6 @@ public class WordUtils {
 
                         String partOfSpeech = c.getString("partOfSpeech");
                         String text = c.getString("text");
-                        Log.i(TAG, partOfSpeech + ": " + text);
                         response += partOfSpeech + ": " + text + '\n' + '\n';
                     }
                 } else {
@@ -75,12 +74,14 @@ public class WordUtils {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            return response;
+            return dataJsonArr;
         }
 
         @Override
-        protected  void onPostExecute(String stringFromDoInBg) {
-            mActivity.processFinish(stringFromDoInBg, AsyncTypes.Type.DEFINITION);
+        protected  void onPostExecute(JSONArray jsonArray) {
+            if (jsonArray.length() > 0) {
+                mActivity.setListAdapter(jsonArray);
+            }
         }
     }
 }
