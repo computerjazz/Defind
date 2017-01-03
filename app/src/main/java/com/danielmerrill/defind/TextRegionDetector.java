@@ -23,8 +23,8 @@ public class TextRegionDetector{
     private int kernelSize;
     private int dilateIndex;
     private String TAG = "TextRegionDetector";
-    private Boolean OPEN = false;
-    private Boolean CLOSE = true;
+    private final Boolean OPEN = false;
+    private final Boolean CLOSE = true;
     private int canvasH;
     private int canvasW;
     private Point canvasCenter;
@@ -70,7 +70,7 @@ public class TextRegionDetector{
     }
 
     public Bitmap process(Bitmap input) {
-        Log.i(TAG, "process()");
+        //Log.i(TAG, "process()");
         Mat rgbaImage = new Mat();
         Utils.bitmapToMat(input, rgbaImage);
 
@@ -179,11 +179,11 @@ public class TextRegionDetector{
         }
     }
 
-    private int getDistance(Point p1, Point p2) {
+    private static int getDistance(Point p1, Point p2) {
         return (int) Math.sqrt((p1.x-p2.x)*(p1.x-p2.x) + (p1.y-p2.y)*(p1.y-p2.y));
     }
 
-    private Point pad (Point coord, Mat img, int padding, boolean closed) {
+    private static Point pad (Point coord, Mat img, int padding, boolean closed) {
         Point padded = new Point();
         if (!closed) {
             padded.x = (coord.x - padding > 0) ? coord.x - padding : 0;
@@ -214,7 +214,7 @@ public class TextRegionDetector{
     private void setCenterWord(Rect newCenterWord, Mat img) {
         centerWordRect = newCenterWord;
         rectToReturn = cvRectToPaddedAndroidRect(centerWordRect, padding, img);
-        Log.i(TAG, "Center Word at " + centerWordRect.x + ", " + centerWordRect.y);
+        //Log.i(TAG, "Center Word at " + centerWordRect.x + ", " + centerWordRect.y);
     }
 
 }

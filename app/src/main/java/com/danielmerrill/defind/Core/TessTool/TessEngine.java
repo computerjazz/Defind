@@ -29,14 +29,15 @@ public class TessEngine {
         TessBaseAPI tessBaseAPI = new TessBaseAPI();
         String path = TessDataManager.getTesseractFolder();
         Log.d(TAG, "Tess folder: " + path);
-        tessBaseAPI.setDebug(true);
+
         tessBaseAPI.init(path, "eng");
+        tessBaseAPI.setDebug(false);
 
         //get letters only
         //tessBaseAPI.setVariable(TessBaseAPI.VAR_CHAR_WHITELIST, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
         //tessBaseAPI.setVariable(TessBaseAPI.VAR_CHAR_BLACKLIST, "!@#$%^&*()_+=-[]}{" +
         //        ";:'\"\\|~`,./<>?");
-        tessBaseAPI.setPageSegMode(TessBaseAPI.OEM_TESSERACT_CUBE_COMBINED);
+        tessBaseAPI.setPageSegMode(TessBaseAPI.PageSegMode.PSM_SINGLE_WORD);
         Log.d(TAG, "Ended initialization of TessEngine");
         Log.d(TAG, "Running inspection on bitmap");
         tessBaseAPI.setImage(bitmap);

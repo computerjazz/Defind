@@ -200,7 +200,7 @@ public class CameraEngine {
                 public void onPreviewFrame(byte[] data, Camera camera) {
 
                         try {
-                            camera.addCallbackBuffer(yuv);
+                            //camera.addCallbackBuffer(yuv);
 
                             previewBmp = null;
                             previewBmp = getBitmapImageFromYUV(data, captureRect, previewSize.width, previewSize.height, bmpQuality);
@@ -213,9 +213,7 @@ public class CameraEngine {
                             }
                                 mActivity.getWordBmpFromFullImage(previewBmp);
 
-                            camera.addCallbackBuffer(yuv);
-                            //System.gc(); // Seems to cause problems (phone restart)
-
+                            camera.addCallbackBuffer(data);
 
 
                         } catch (Exception e) {
@@ -305,10 +303,9 @@ public class CameraEngine {
         bitmapFatoryOptions.inPreferredConfig = Bitmap.Config.RGB_565;
 
         byte[] jdata = baos.toByteArray();
-        Bitmap bmp = BitmapFactory.decodeByteArray(jdata, 0, jdata.length, bitmapFatoryOptions);
         yuvimage = null;
         baos = null;
-        return bmp;
+        return BitmapFactory.decodeByteArray(jdata, 0, jdata.length, bitmapFatoryOptions);
     }
 
     public static Bitmap rotateBitmap(Bitmap source, float angle)

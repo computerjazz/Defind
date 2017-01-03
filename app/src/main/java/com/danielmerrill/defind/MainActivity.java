@@ -2,11 +2,14 @@ package com.danielmerrill.defind;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.hardware.Camera;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -27,6 +30,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.danielmerrill.defind.Core.CameraEngine;
 import com.danielmerrill.defind.Core.ExtraViews.FocusBoxView;
@@ -79,6 +83,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
 
     private String foundWord;
     private String previousWord;
+    private String searchedWord;
     private ArrayList<HashMap<String, String>> definitionList = new ArrayList<>();
     private final String WORD = "word";
     private final String PART_OF_SPEECH = "partOfSpeech";
@@ -86,6 +91,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
 
     // Set up some TessAsyncEngines
     private int NUMBER_OF_ENGINES = 1;
+    private int OCR_IMAGE_HEIGHT = 75;
     private TessAsyncEngine[] asyncEngineArray;
     private TessEngine[] tessEngineArray;
 
@@ -118,8 +124,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
         focusBoxView = (FocusBoxView) findViewById(R.id.focus_box);
         wordText = (TextView) findViewById(R.id.word_text);
 
-        // Set height of image to be sent to OCR
-        ocrImageHeight = 75;
+        ocrImageHeight = OCR_IMAGE_HEIGHT;
 
         // Testing tools init
         debug = false;
@@ -244,6 +249,13 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
             editor.commit();
         }
         return !ranBefore;
+    }
+
+    private boolean networkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null;
     }
 
     @Override
@@ -433,11 +445,18 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
                 case WORD:
                     foundWord = StringUtils.parseLines(s).replaceAll("\\s+", "");
                     timestamp = System.currentTimeMillis();
-                    if ((foundWord.length() > 1) && !foundWord.equals(previousWord)) {
+                    if (!networkAvailable()) {
+                        Toast.makeText(getApplicationContext(), "No network connection", Toast.LENGTH_LONG).show();
+                    }
+                    else if ((foundWord.length() > 1) && !foundWord.equals(previousWord)) {
                         wordUtils.setWord(foundWord);
                         previousWord = foundWord;
 
+                    } else if ((foundWord.length() > 1) && foundWord.equals(previousWord) && !foundWord.equals(searchedWord)) {
+                        Toast.makeText(getApplicationContext(), "\"" + foundWord + "\" not found",
+                                Toast.LENGTH_SHORT).show();
                     }
+
                     break;
 
                 case DEFINITION:
@@ -448,6 +467,10 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
                     break;
             }
         }
+    }
+
+    public void setSearchedWord(String word) {
+        searchedWord = word;
     }
 
     public void setListAdapter(JSONArray jsonArray) {

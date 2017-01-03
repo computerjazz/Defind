@@ -143,7 +143,7 @@ public class FocusBoxView extends View {
             textBox.right = (int)((float)textBox.right * canvasToPreviewRatioW);
             textBox.bottom = (int)((float)textBox.bottom * canvasToPreviewRatioH);
 
-            Log.i(TAG, "Drawing a textBox at (" + textBox.left +", " + textBox.top + ") from frame edge");
+         //   Log.i(TAG, "Drawing a textBox at (" + textBox.left +", " + textBox.top + ") from frame edge");
             textBoxRounded.resize(textBox.width(),textBox.height());
             canvas.save();
             canvas.translate(frame.left + textBox.left, frame.top + textBox.top);

@@ -79,7 +79,9 @@ public class WordUtils {
         @Override
         protected  void onPostExecute(JSONArray jsonArray) {
             if (jsonArray.length() > 0) {
+                mActivity.setSearchedWord(word);
                 mActivity.setListAdapter(jsonArray);
+
             }
         }
     }

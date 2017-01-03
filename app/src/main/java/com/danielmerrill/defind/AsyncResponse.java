@@ -11,4 +11,5 @@ public interface AsyncResponse {
     void processFinish(String output, AsyncTypes.Type type);
     void setListAdapter(JSONArray jsonArray);
     void releaseTask(int thisTaskId, long timestamp);
+    void setSearchedWord(String word);
 }

@@ -8,13 +8,13 @@ android {
         applicationId "com.danielmerrill.defind"
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 1
+        versionCode 14
         versionName "1.0"
     }
     buildTypes {
         release {
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -23,7 +23,7 @@ android {
             enable true
             reset()
             include 'x86', 'mips', 'armeabi-v7a', 'armeabi' //select ABIs to build APKs for
-            universalApk true //generate an additional APK that contains all the ABIs
+            universalApk false //generate an additional APK that contains all the ABIs
         }
     }
 
