@@ -1,2 +1,2 @@
 #Privacy Policy
-Defind does not store or transmit any user information or photos.
+Defind does not store or transmit any user information or images.
