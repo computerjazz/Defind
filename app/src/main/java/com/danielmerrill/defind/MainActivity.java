@@ -19,6 +19,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -58,6 +59,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
     private SurfaceView cameraFrame;
     private TextView wordText;
     private Bitmap wordBmp;
+    private ScaleGestureDetector scaleGestureDetector;
     private boolean paused;
     private boolean debug;
 
@@ -101,7 +103,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
         public void onManagerConnected(int status) {
             switch (status) {
                 case LoaderCallbackInterface.SUCCESS: {
-                    Log.i(TAG, "OpenCV loaded successfully");
+                    Log.d(TAG, "OpenCV loaded successfully");
                 }
                 break;
                 default: {
@@ -114,7 +116,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.i(TAG, "onCreate()");
+        Log.d(TAG, "onCreate()");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -201,7 +203,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
 
         if (isFirstTime()) {
             // Show instruction screen the first time in
-            Log.i(TAG, "First time in!");
+            Log.d(TAG, "First time in!");
             instructionsFrag = new InstructionsFragment();
             getFragmentManager().beginTransaction()
                     .add(R.id.frame_layout, instructionsFrag)
@@ -239,6 +241,13 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
 
     }
 
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent e) {
+        super.dispatchTouchEvent(e);
+        scaleGestureDetector.onTouchEvent(e);
+        return true;
+    }
+
     private boolean isFirstTime() {
         SharedPreferences preferences = getPreferences(MODE_PRIVATE);
         boolean ranBefore = preferences.getBoolean("RanBefore", false);
@@ -267,11 +276,12 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 
-        Log.i(TAG, "surfaceChanged()");
-
+        Log.d(TAG, "surfaceChanged()");
+        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+        int zoom = preferences.getInt("zoomLevel", 10);
         if (cameraEngine != null && !cameraEngine.isOn()) {
             Log.d(TAG, "Starting camera...");
-            cameraEngine.start();
+            cameraEngine.start(zoom);
         }
 
         if (cameraEngine != null && cameraEngine.isOn()) {
@@ -283,7 +293,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
         cameraEngine.setHeight(holder.getSurfaceFrame().height());
         cameraEngine.setWidth(holder.getSurfaceFrame().width());
         cameraEngine.setImagePreview(previewImage);
-        cameraEngine.start();
+        cameraEngine.start(zoom);
+        scaleGestureDetector = new ScaleGestureDetector(this, new ScaleListener(this, cameraEngine.getCamera()));
 
 
         Log.i(TAG, "Camera Frame width= " + cameraFrame.getWidth() + " height= " + cameraFrame.getHeight());
