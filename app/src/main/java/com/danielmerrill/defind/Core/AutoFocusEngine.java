@@ -34,7 +34,6 @@ public class AutoFocusEngine implements Camera.AutoFocusCallback {
     }
 
     public void start() {
-        Log.d(TAG, "AutoFocusEngine Started");
         work();
         running = true;
     }
@@ -47,10 +46,7 @@ public class AutoFocusEngine implements Camera.AutoFocusCallback {
             timerTask.cancel();
             timerTask = null;
         }
-
         running = false;
-
-        Log.d(TAG, "AutoFocusEngine Stopped");
     }
 
     private void work(){
