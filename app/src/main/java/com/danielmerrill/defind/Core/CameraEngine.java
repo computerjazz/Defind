@@ -1,5 +1,7 @@
 package com.danielmerrill.defind.Core;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
@@ -81,7 +83,7 @@ public class CameraEngine {
         int height = screenHeight / 9;
 
         int top = (screenWidth - width) / 2;
-        int left = (screenWidth - width) / 2;;
+        int left = (screenWidth - width) / 2;
         int right = left + width;
         int bottom = top + height;
 
@@ -113,7 +115,7 @@ public class CameraEngine {
 
 
 
-    public void start() {
+    public void start(int initialZoom) {
 
         Log.d(TAG, "Entered CameraEngine - start()");
 
@@ -122,7 +124,12 @@ public class CameraEngine {
 
         // Maybe in the future change this to more dynamically match phone models
         if (params.isZoomSupported()) {
-            params.setZoom(0);
+            Log.i("MAX ZOOM", "" + params.getMaxZoom());
+            SharedPreferences prefs = mActivity.getPreferences(Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putInt("maxZoom", params.getMaxZoom());
+            editor.commit();
+            params.setZoom(initialZoom);
         }
 
         if (!cameraConfigured) {
@@ -163,6 +170,7 @@ public class CameraEngine {
             if (previewSize != null) {
                 params.setPreviewSize(previewSize.width,
                         previewSize.height);
+                Log.i("params", params.toString());
                 camera.setParameters(params);
                 cameraConfigured = true;
             }
@@ -313,6 +321,10 @@ public class CameraEngine {
         Matrix matrix = new Matrix();
         matrix.postRotate(angle);
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
+    }
+
+    public Camera getCamera() {
+        return camera;
     }
 }
 
