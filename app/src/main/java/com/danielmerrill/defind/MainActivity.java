@@ -103,7 +103,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
         public void onManagerConnected(int status) {
             switch (status) {
                 case LoaderCallbackInterface.SUCCESS: {
-                    Log.d(TAG, "OpenCV loaded successfully");
                 }
                 break;
                 default: {
@@ -116,7 +115,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate()");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -203,7 +201,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
 
         if (isFirstTime()) {
             // Show instruction screen the first time in
-            Log.d(TAG, "First time in!");
             instructionsFrag = new InstructionsFragment();
             getFragmentManager().beginTransaction()
                     .add(R.id.frame_layout, instructionsFrag)
@@ -269,23 +266,18 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        Log.d(TAG, "surfaceCreated()");
-
     }
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 
-        Log.d(TAG, "surfaceChanged()");
         SharedPreferences preferences = getPreferences(MODE_PRIVATE);
         int zoom = preferences.getInt("zoomLevel", 10);
         if (cameraEngine != null && !cameraEngine.isOn()) {
-            Log.d(TAG, "Starting camera...");
             cameraEngine.start(zoom);
         }
 
         if (cameraEngine != null && cameraEngine.isOn()) {
-            Log.d(TAG, "Camera engine already on");
             return;
         }
 
@@ -295,15 +287,10 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
         cameraEngine.setImagePreview(previewImage);
         cameraEngine.start(zoom);
         scaleGestureDetector = new ScaleGestureDetector(this, new ScaleListener(this, cameraEngine.getCamera()));
-
-
-        Log.i(TAG, "Camera Frame width= " + cameraFrame.getWidth() + " height= " + cameraFrame.getHeight());
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        Log.i(TAG, "surfaceDestroyed()");
-
     }
 
     @Override
@@ -317,7 +304,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_about:
-                Log.i(TAG, "About menu");
         }
         return true;
     }
@@ -325,18 +311,14 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
 
     @Override
     protected void onResume() {
-        Log.i(TAG, "onResume()");
         super.onResume();
         if (!OpenCVLoader.initDebug()) {
-            Log.d(TAG, "Internal OpenCV library not found. Using OpenCV Manager for initialization");
             OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_0_0, this, mLoaderCallback);
         } else {
-            Log.d(TAG, "OpenCV library found inside package. Using it!");
             mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
         }
 
         SurfaceHolder surfaceHolder = cameraFrame.getHolder();
-        Log.i(TAG, "Surfaceholder: height: " + surfaceHolder.getSurfaceFrame().height());
         surfaceHolder.addCallback(this);
         surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         cameraFrame.setVisibility(View.VISIBLE);
@@ -345,11 +327,9 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
 
     @Override
     protected void onPause() {
-        Log.i(TAG, "onPause()");
         super.onPause();
 
         if (cameraEngine != null && cameraEngine.isOn()) {
-            Log.i(TAG, "stopping camera");
             cameraEngine.stop();
         }
 
@@ -361,7 +341,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
 
     @Override
     protected void onDestroy() {
-        Log.i(TAG, "onDestroy()");
         super.onDestroy();
     }
 
@@ -372,7 +351,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
 
     @Override
     public void onPictureTaken(byte[] data, Camera camera) {
-        Log.d(TAG, "Picture taken");
     }
 
     @Override
@@ -401,7 +379,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
     }
 
     public void setPreviewSize(int w, int h) {
-        Log.i(TAG, "Main activity setting BMP");
         focusBoxView.setPreviewSize(w, h);
     }
 
@@ -432,7 +409,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
             }
         }
         if (engineFree) {
-            Log.i(TAG, "Creating new tessengine with index " + engineIndex);
             TessAsyncEngine tessAsyncEngine = new TessAsyncEngine();
             tessAsyncEngine.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, this, bmp, this, engineIndex, tessEngineArray[engineIndex]);
             asyncEngineArray[engineIndex] = tessAsyncEngine;

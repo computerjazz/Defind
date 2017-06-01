@@ -7,8 +7,6 @@ import android.util.Log;
  */
 public class StringUtils {
 
-    final static String TAG = "ocrlive.StringUtils";
-
     public static String clean(String s){
         String cleanString = s.toLowerCase();
         // replace all non alphabetic characters with spaces
@@ -24,13 +22,12 @@ public class StringUtils {
 
         int midpoint = s.length() / 2;
         // if the midpoint is a space scoot it back one index
-        Log.i(TAG, s + " midpoint: " + midpoint);
         /*
         if (Character.toString(s.charAt(midpoint)).equals(" ")) {
             midpoint -= 1;
         }*/
 
-        // Cut stiring in half
+        // Cut string in half
         String startToMid = s.substring(0, midpoint);
         // Find the last space in the first half of the phrase
         if (startToMid.lastIndexOf(" ", midpoint-1) > 0) {
@@ -48,9 +45,6 @@ public class StringUtils {
         } else {
             word = s.substring(centerWordStart, centerWordEnd);
         }
-
-        Log.i(TAG, "Word = " + word);
-        Log.i(TAG, "End string length =" + s.length() + " String start index=" + centerWordStart + " End index= " + centerWordEnd);
 
         return word;
     }

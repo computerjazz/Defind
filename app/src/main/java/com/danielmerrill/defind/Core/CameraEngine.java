@@ -53,7 +53,6 @@ public class CameraEngine {
     Camera.AutoFocusCallback autoFocusCallback = new Camera.AutoFocusCallback() {
         @Override
         public void onAutoFocus(boolean success, Camera camera) {
-        Log.i(TAG, "Focusing...");
         }
     };
 
@@ -62,7 +61,7 @@ public class CameraEngine {
     }
 
     public void setBox(Rect box) {
-        Log.i(TAG, "setBox(), " + box.top + " " + box.right + " " + box.bottom + " " + box.left);
+        //Log.d(TAG, "setBox(), " + box.top + " " + box.right + " " + box.bottom + " " + box.left);
         if (box != null) {
             focusBox = box;
         }
@@ -87,7 +86,7 @@ public class CameraEngine {
         int right = left + width;
         int bottom = top + height;
 
-        Log.i(TAG, "calcBox(): left=" + left + ", top=" + top + ", right=" + right + ", bottom=" + bottom);
+        //Log.d(TAG, "calcBox(): left=" + left + ", top=" + top + ", right=" + right + ", bottom=" + bottom);
 
 
         return new Rect(top, left, bottom, right);
@@ -109,7 +108,7 @@ public class CameraEngine {
     }
 
     static public CameraEngine New(SurfaceHolder surfaceHolder, MainActivity mActivity){
-        Log.d(TAG, "Creating camera engine");
+        //Log.d(TAG, "Creating camera engine");
         return  new CameraEngine(surfaceHolder, mActivity);
     }
 
@@ -117,14 +116,14 @@ public class CameraEngine {
 
     public void start(int initialZoom) {
 
-        Log.d(TAG, "Entered CameraEngine - start()");
+        //Log.d(TAG, "Entered CameraEngine - start()");
 
         this.camera = CameraUtils.getCamera();
         params = camera.getParameters();
 
         // Maybe in the future change this to more dynamically match phone models
         if (params.isZoomSupported()) {
-            Log.i("MAX ZOOM", "" + params.getMaxZoom());
+            //Log.d("MAX ZOOM", "" + params.getMaxZoom());
             SharedPreferences prefs = mActivity.getPreferences(Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = prefs.edit();
             editor.putInt("maxZoom", params.getMaxZoom());
@@ -134,17 +133,17 @@ public class CameraEngine {
 
         if (!cameraConfigured) {
 
-            Log.i(TAG, "Raw width = " + width + ", height = " + height);
+            //Log.d(TAG, "Raw width = " + width + ", height = " + height);
             previewSize = getBestPreviewSize(width, height, params);
-            Log.i(TAG, "width=" + previewSize.width + ", height= " + previewSize.height);
-            Log.i(TAG, "Max focus areas: " + params.getMaxNumFocusAreas());
+            //Log.d(TAG, "width=" + previewSize.width + ", height= " + previewSize.height);
+            //Log.d(TAG, "Max focus areas: " + params.getMaxNumFocusAreas());
 
             // Figure out if we have continuous focus
             boolean hasFocusModeAuto = false;
             boolean hasFocusModeContinuousPicture = false;
             List<String> supportedFocusModes = params.getSupportedFocusModes();
             for (String s : supportedFocusModes) {
-                Log.i(TAG, "Has focus mode: " + s);
+                //Log.d(TAG, "Has focus mode: " + s);
                 if (s.equals("auto")) {
                     hasFocusModeAuto = true;
                 } else if (s.equals("continuous-picture")) {
@@ -170,7 +169,6 @@ public class CameraEngine {
             if (previewSize != null) {
                 params.setPreviewSize(previewSize.width,
                         previewSize.height);
-                Log.i("params", params.toString());
                 camera.setParameters(params);
                 cameraConfigured = true;
             }
@@ -184,13 +182,12 @@ public class CameraEngine {
 
 
 
-        Log.d(TAG, "Got camera hardware");
-        Log.i(TAG, "Preview size: " + previewSize.width + " x " + previewSize.height);
+        //Log.d(TAG, "Preview size: " + previewSize.width + " x " + previewSize.height);
 
         try {
 
             this.camera.setPreviewDisplay(this.surfaceHolder);
-            Log.i(TAG, "Surface width:" + surfaceHolder.getSurfaceFrame().width() + "height: " + surfaceHolder.getSurfaceFrame().height());
+            //Log.i(TAG, "Surface width:" + surfaceHolder.getSurfaceFrame().width() + "height: " + surfaceHolder.getSurfaceFrame().height());
             this.camera.setDisplayOrientation(90);
             this.camera.startPreview();
 
@@ -199,7 +196,7 @@ public class CameraEngine {
 
             // Initialize a box to use for capture
             captureRect = calcBox();
-            Log.i(TAG, "captureRect: " + captureRect.width() + " " + captureRect.height());
+            //Log.i(TAG, "captureRect: " + captureRect.width() + " " + captureRect.height());
 
             camera.addCallbackBuffer(yuv);
             camera.setPreviewCallbackWithBuffer(new Camera.PreviewCallback() {
@@ -225,7 +222,7 @@ public class CameraEngine {
 
 
                         } catch (Exception e) {
-                            Log.i(TAG, "onPreviewFrame() error: " + e.toString());
+                            Log.e(TAG, "onPreviewFrame() error: " + e.toString());
                         }
                     }
             });
@@ -233,7 +230,6 @@ public class CameraEngine {
 
             on = true;
 
-            Log.d(TAG, "CameraEngine preview started");
 
         } catch (IOException e) {
             Log.e(TAG, "Error in setPreviewDisplay");
@@ -250,7 +246,6 @@ public class CameraEngine {
 
         on = false;
 
-        Log.d(TAG, "CameraEngine Stopped");
     }
 
 
@@ -258,7 +253,7 @@ public class CameraEngine {
         int pixelformat = ImageFormat.getBitsPerPixel(camera.getParameters()
                 .getPreviewFormat());
         int bufSize = (previewSize.width * previewSize.height * pixelformat) / 8;
-        Log.i(TAG, "getBufferSize(): pixelformat = " + pixelformat + ", Previewsize Width = " + previewSize.width + ", height = " + previewSize.height + ", buffer size is " + bufSize);
+        //Log.i(TAG, "getBufferSize(): pixelformat = " + pixelformat + ", Previewsize Width = " + previewSize.width + ", height = " + previewSize.height + ", buffer size is " + bufSize);
         return bufSize;
     }
     /*
@@ -270,7 +265,7 @@ public class CameraEngine {
         Camera.Size result = null;
         for (Camera.Size size : parameters.getSupportedPreviewSizes()) {
             if ((size.width <= width) && (size.height <= height)) {
-                Log.i(TAG, "Testing " + size.width + " x " + size.height);
+                //Log.i(TAG, "Testing " + size.width + " x " + size.height);
                 if (result == null) {
                     // sets the result to the first option we find
                     result = size;
@@ -285,17 +280,15 @@ public class CameraEngine {
 
             }
         }
-        Log.i(TAG, "Best preview size is width = " + result.width + ", height = " + result.height);
+        //Log.i(TAG, "Best preview size is width = " + result.width + ", height = " + result.height);
         return result;
     }
 
     public void setWidth(int width) {
-        Log.i(TAG, "setWidth() to " + width);
         this.width = width;
     }
 
     public void setHeight(int height) {
-        Log.i(TAG, "setHeight() to " + height);
         this.height = height;
     }
 
