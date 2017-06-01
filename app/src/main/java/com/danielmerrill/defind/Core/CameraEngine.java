@@ -227,9 +227,7 @@ public class CameraEngine {
                     }
             });
 
-
             on = true;
-
 
         } catch (IOException e) {
             Log.e(TAG, "Error in setPreviewDisplay");
