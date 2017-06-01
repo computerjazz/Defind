@@ -27,6 +27,10 @@ public class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureList
 
     }
 
+    public void setCamera(Camera camera) {
+        this.camera = camera;
+    }
+
     @Override
     public boolean onScale(ScaleGestureDetector detector) {
         params = camera.getParameters();
