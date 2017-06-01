@@ -60,6 +60,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
     private TextView wordText;
     private Bitmap wordBmp;
     private ScaleGestureDetector scaleGestureDetector;
+    private ScaleListener scaleListener;
     private boolean paused;
     private boolean debug;
 
@@ -270,7 +271,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-
         SharedPreferences preferences = getPreferences(MODE_PRIVATE);
         int zoom = preferences.getInt("zoomLevel", 10);
         if (cameraEngine != null && !cameraEngine.isOn()) {
@@ -278,6 +278,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
         }
 
         if (cameraEngine != null && cameraEngine.isOn()) {
+            initScaleListener(cameraEngine.getCamera());
             return;
         }
 
@@ -286,7 +287,18 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
         cameraEngine.setWidth(holder.getSurfaceFrame().width());
         cameraEngine.setImagePreview(previewImage);
         cameraEngine.start(zoom);
-        scaleGestureDetector = new ScaleGestureDetector(this, new ScaleListener(this, cameraEngine.getCamera()));
+        initScaleListener(cameraEngine.getCamera());
+    }
+
+    private void initScaleListener(Camera camera) {
+        if (scaleListener == null ) {
+            scaleListener = new ScaleListener(this, camera);
+        } else {
+            scaleListener.setCamera(camera);
+        }
+        if (scaleGestureDetector == null) {
+            scaleGestureDetector = new ScaleGestureDetector(this, scaleListener);
+        }
     }
 
     @Override
@@ -317,6 +329,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
         } else {
             mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
         }
+
+
 
         SurfaceHolder surfaceHolder = cameraFrame.getHolder();
         surfaceHolder.addCallback(this);
